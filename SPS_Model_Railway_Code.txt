@@ -1,0 +1,81 @@
+
+
+UN E1.7     // und nicht für Not-Aus, da im Betrieb logisch 1
+FN M10.0    // regestriert negative Flanke (1->0) für Not-Aus Schalter
+S M120.3    // Set "STOP"
+R Z1        // Reset RundenZähler zu Beginn des Programms
+            // Teil einer späteren Aufgabe
+
+
+U E1.7        // Eingang: Not-Aus Bit -> logisch 0
+FP M11.0      // regestriert positive Flanke (0->1)
+S "Speed1IU"  // set Speed... (Merker 120.2)
+
+
+U "xR01BH1G1"  // Eingangssignal
+S "Speed2IU"   // Set Speed
+L S5T#600MS    // Lade Systemzeit 600MS (=300MS pro Weiche)
+SV T 10        // Starte verlängerten Impuls
+U T 10         // Und Impuls läuft
+="xW02BH1G1R";"W01BH1G1G"   // Schalte Weichen nacheinander
+
+
+U "xR03A"      // Eingangssignal
+S "Speed3IU"   // Set Speed
+
+
+U "xR01A"        // Eingangssignal
+S "Speed2IU"     // Set Speed
+L S5T#300MS      // Lade Systemzeit
+SV T 11          // Starte verlängerten Impuls
+U T 11           // Und Impuls läuft
+= "xW02BH2G1G"   // Schalte Weiche
+
+
+U "xR02BH2G1"  // Eingangssignal
+S "Speed1IU"   // Set Speed
+
+
+U "xR01BH2G1"  // Eingangssignal
+FP M12.0       // Positive Flanke 0->1
+S M120.3       // Set STOP
+L S5T#5S       // Lade Systemzeit 5Sek.
+SS T 12        // Set Timer
+U E1.7         // liegt "STOP" an
+R T 12         // rücksetze die Zeit
+U T 12         // wenn T 12 TRUE ist
+S "Speed2IU"   // Set Speed
+L S5T#300MS    // Lade Systemzeit
+SV T 13        // Starte verlängerten Impuls
+U T 13         // Und Impuls läuft
+= "xW01BH2G1R" // setze Weiche
+
+
+U "xR03E"     // Eingangssignal
+S "Speed3IU"  // Set Speed
+
+
+U "xR01E"        // Eingangssignal
+S "Speed2IU"     // Set Speed
+L S5T#600MS      // Lade Systemzeit
+SV T 14          // Starte verlängerten Impuls
+U T 14           // Und Timer
+= "xW04Bh1G2R";"xW05BH1G2G"  // Stelle Weichen
+U "xR02BH1G1"    // Eingangssignal
+S "Speed1IU"     // Set Speed
+
+
+U "xR01E"      // Eingangssignal
+L S5T#1S       // Lade Systemzeit 1Sek.
+SV T 15        // Set Timer
+U T 15         // Und Timer
+FP M13.0       // Positive Flanke 0->1
+ZV Z1          // Set Zähler + 1
+               // wurde im vorherigen Code schon re-setted
+
+
+L C#002         // Lade Rundenzahl (C#002) in Akku_1
+L Z1            // Lade Z1 in Akku_1, in Akku_2 steht nun C#002
+>=I             // Prüfe, ob Akku_2 gleich oder größer Akku_1
+U "xR01BH1G1"   // und Positionsgeber erreicht
+S "STOP"        // dann "STOP"
